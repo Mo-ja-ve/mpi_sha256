@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
   int stop_index = (int)t+25000;
   cpp_int next_sha;
   bool found = false;
-  while (!found && t < stop_index) {
+  while (!found) {
     next_sha = sha256(t);
     if (t1 < next_sha) {
       if (next_sha < t2) {
