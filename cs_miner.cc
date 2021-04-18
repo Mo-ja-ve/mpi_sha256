@@ -90,9 +90,11 @@ int main(int argc, char *argv[]) {
     }
   }
 
-
   vector <unsigned char> cpp_intExport;
+
+  if(myid == 0)
   export_bits(v_int[0], back_inserter(cpp_intExport), 8);
+
   int num_export = cpp_intExport.size();
   MPI_Bcast(&num_export, 1, MPI_INT, 0, MPI_COMM_WORLD);
   cpp_intExport.resize(num_export);
