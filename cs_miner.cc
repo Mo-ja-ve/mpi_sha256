@@ -79,21 +79,21 @@ int main(int argc, char *argv[]) {
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
-  vector <cpp_int> v_int[3];
-  int tempint = 0;
+  vector <cpp_int> v_int;
   if(myid == 0){
     while (!cin.eof()) {
       string line;
       getline(cin, line);
       if(!cin.fail()){
-        v_int[tempint] = line;
-        tempint++;
+        v_int.emplace_back(line);
       }
     }
   }
-  
-  vector <unsigned char> cpp_intExport;
 
+  if(myid==0)
+    cout<<"v int: "<<v_int[1]<<endl;
+
+  vector <unsigned char> cpp_intExport;
   if(myid == 0)
     export_bits(v_int[0], back_inserter(cpp_intExport), 8);
 
