@@ -110,7 +110,6 @@ int main(int argc, char *argv[]) {
 
   cpp_int t1 = 0;
   import_bits(t1, cpp_intExport.begin(), cpp_intExport.end());
-  cout<<"number: "<<t1<<endl;
 
   vector <unsigned char> cpp_intExport_2;
 
@@ -130,22 +129,28 @@ int main(int argc, char *argv[]) {
 
   cpp_int t2 = 0;
   import_bits(t2, cpp_intExport_2.begin(), cpp_intExport_2.end());
-  cout<<"number: "<<t2<<endl;
 
-  // cpp_int t = 0;
-  // cpp_int next_sha;
-  // bool found = false;
-  // while (!found) {
-  //   next_sha = sha256(t);
-  //   if (t1 < next_sha) {
-  //     if (next_sha < t2) {
-	// //cerr << next_sha << endl;
-	// cout << t << endl;
-	// found =true;
-  //     }
-  //   }
-  //   t=t+1;
-  // }
+  assert(t1 < t2);
+
+  cpp_int t      = (cpp_int)myid*25000;
+  int stop_index = t+25000;
+  cpp_int next_sha;
+  bool found = false;
+  while (!found && t < stop_index) {
+    next_sha = sha256(t);
+    if (t1 < next_sha) {
+      if (next_sha < t2) {
+	//cerr << next_sha << endl;
+	cout << t << endl;
+	found =true;
+      }
+    }
+    t=t+1;
+    if(t == stop_index){
+      t = t*num_procs;
+      stop_index = t + (num_procs*25000);
+    }
+  }
 
   MPI_Finalize();
 }
