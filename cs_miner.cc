@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
   assert(t1 < t2);
 
   cpp_int t      = (cpp_int)myid*25000;
-  int stop_index = t+25000;
+  int stop_index = (int)t+25000;
   cpp_int next_sha;
   bool found = false;
   while (!found && t < stop_index) {
@@ -147,8 +147,8 @@ int main(int argc, char *argv[]) {
     }
     t=t+1;
     if(t == stop_index){
-      t = t*num_procs;
-      stop_index = t + (num_procs*25000);
+      t = t*(cpp_int)num_procs;
+      stop_index = (int)t + (num_procs*25000);
     }
   }
 
