@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
       string line;
       getline(cin, line);
       if(!cin.fail()){
-        v_int.emplace_back(line);
+        v_int.push_back(line);
       }
     }
   }
