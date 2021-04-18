@@ -90,8 +90,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if(myid==0)
-    cout<<"v int: "<<v_int[1]<<endl;
 
   vector <unsigned char> cpp_intExport;
   if(myid == 0)
