@@ -79,17 +79,19 @@ int main(int argc, char *argv[]) {
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
-  vector <cpp_int> v_int;
+  vector <cpp_int> v_int[3];
+  int tempint = 0;
   if(myid == 0){
     while (!cin.eof()) {
       string line;
       getline(cin, line);
       if(!cin.fail()){
-        v_int.push_back(line);
+        v_int[tempint] = line;
+        tempint++;
       }
     }
   }
-
+  
   vector <unsigned char> cpp_intExport;
 
   if(myid == 0)
