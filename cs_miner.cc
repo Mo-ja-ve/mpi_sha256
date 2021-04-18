@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
   vector <unsigned char> cpp_intExport;
 
   if(myid == 0)
-  export_bits(v_int[0], back_inserter(cpp_intExport), 8);
+    export_bits(v_int[0], back_inserter(cpp_intExport), 8);
 
   int num_export = cpp_intExport.size();
   MPI_Bcast(&num_export, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -105,16 +105,31 @@ int main(int argc, char *argv[]) {
     unsigned char temp = charint;
     cpp_intExport[i] = temp;
   }
+
   cpp_int t1 = 0;
   import_bits(t1, cpp_intExport.begin(), cpp_intExport.end());
   cout<<"number: "<<t1<<endl;
 
-  //
-  // cpp_int t1 = v_int[0];
-  // cpp_int t2 = v_int[1];
-  // assert(t1 < t2);
-  // cout<<endl;
-  //
+  vector <unsigned char> cpp_intExport;
+
+  if(myid == 0)
+    export_bits(v_int[1], back_inserter(cpp_intExport), 8);
+
+  int num_export = cpp_intExport.size();
+  MPI_Bcast(&num_export, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  cpp_intExport.resize(num_export);
+
+  for(int i = 0; i < cpp_intExport.size(); i++){
+    unsigned char charint = cpp_intExport[i];
+    broadcast(charint);
+    unsigned char temp = charint;
+    cpp_intExport[i] = temp;
+  }
+
+  cpp_int t2 = 0;
+  import_bits(t2, cpp_intExport.begin(), cpp_intExport.end());
+  cout<<"number: "<<t2<<endl;
+
   // cpp_int t = 0;
   // cpp_int next_sha;
   // bool found = false;
