@@ -115,19 +115,19 @@ int main(int argc, char *argv[]) {
   if(myid == 0)
     export_bits(v_int[1], back_inserter(cpp_intExport_2), 8);
 
-  num_export = cpp_intExport.size();
+  num_export = cpp_intExport_2.size();
   MPI_Bcast(&num_export, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  cpp_intExport.resize(num_export);
+  cpp_intExport_2.resize(num_export);
 
-  for(int i = 0; i < cpp_intExport.size(); i++){
-    unsigned char charint = cpp_intExport[i];
+  for(int i = 0; i < cpp_intExport_2.size(); i++){
+    unsigned char charint = cpp_intExport_2[i];
     broadcast(charint);
     unsigned char temp = charint;
-    cpp_intExport[i] = temp;
+    cpp_intExport_2[i] = temp;
   }
 
   cpp_int t2 = 0;
-  import_bits(t2, cpp_intExport.begin(), cpp_intExport.end());
+  import_bits(t2, cpp_intExport_2.begin(), cpp_intExport_2.end());
   cout<<"number: "<<t2<<endl;
 
   // cpp_int t = 0;
