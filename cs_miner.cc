@@ -22,6 +22,17 @@
 using namespace std;
 using namespace boost::multiprecision;
 
+
+
+void broadcast(unsigned char &cpp_intExport){
+
+  // int buffer[2];
+  // buffer[0] = cpp_intExport.size();
+  //
+  // MPI_Bcast(buffer, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(&cpp_intExport, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
+}
 //
 // Function: to_bits
 // Converts a cpp_int x into a vector of unsigned characters (8-bit ints).
@@ -60,51 +71,62 @@ cpp_int sha256(const cpp_int x)
 
   return total;
 }
+
 int main(int argc, char *argv[]) {
 
   // init stuff for mpi
+  int num_procs, myid;
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
-  int tempindex = 0;
-  cpp_int temp[2];
+  vector <cpp_int> v_int;
   if(myid == 0){
     while (!cin.eof()) {
-      getline(cin, temp[tempindex]);
-      tempindex++;
-    }
-  }
-
-  cpp_int t1;
-  cpp_int t2;
-
-  cin >> t1;
-  cin >> t2;
-  assert(t1 < t2);
-
-  vector <unsigned char> cpp_intExport;
-  export_bits(t1, back_inserter(cpp_intExport), 8);
-
-
-
-  cpp_int t = 0;
-  cpp_int next_sha;
-  bool found = false;
-  while (!found) {
-    next_sha = sha256(t);
-    if (t1 < next_sha) {
-      if (next_sha < t2) {
-	//cerr << next_sha << endl;
-	cout << t << endl;
-	found =true;
+      string line;
+      getline(cin, line);
+      if(!cin.fail()){
+        v_int.emplace_back(line);
       }
     }
-    t=t+1;
   }
 
-}
 
-void broadcast(vector <unsigned char> &cpp_intExport){
+  vector <unsigned char> cpp_intExport;
+  export_bits(v_int[0], back_inserter(cpp_intExport), 8);
+  int num_export = cpp_intExport.size();
+  MPI_Bcast(&num_export, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  cpp_intExport.resize(num_export);
 
+  for(int i = 0; i < cpp_intExport.size(); i++){
+    unsigned char charint = cpp_intExport[i];
+    broadcast(charint);
+    unsigned char temp = charint;
+    cpp_intExport[i] = temp;
+  }
+  cpp_int t1 = 0;
+  import_bits(t1, cpp_intExport.begin(), cpp_intExport.end());
+  cout<<"number: "<<t1<<endl;
 
+  //
+  // cpp_int t1 = v_int[0];
+  // cpp_int t2 = v_int[1];
+  // assert(t1 < t2);
+  // cout<<endl;
+  //
+  // cpp_int t = 0;
+  // cpp_int next_sha;
+  // bool found = false;
+  // while (!found) {
+  //   next_sha = sha256(t);
+  //   if (t1 < next_sha) {
+  //     if (next_sha < t2) {
+	// //cerr << next_sha << endl;
+	// cout << t << endl;
+	// found =true;
+  //     }
+  //   }
+  //   t=t+1;
+  // }
+
+  MPI_Finalize();
 }
