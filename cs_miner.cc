@@ -110,12 +110,12 @@ int main(int argc, char *argv[]) {
   import_bits(t1, cpp_intExport.begin(), cpp_intExport.end());
   cout<<"number: "<<t1<<endl;
 
-  vector <unsigned char> cpp_intExport;
+  vector <unsigned char> cpp_intExport_2;
 
   if(myid == 0)
-    export_bits(v_int[1], back_inserter(cpp_intExport), 8);
+    export_bits(v_int[1], back_inserter(cpp_intExport_2), 8);
 
-  int num_export = cpp_intExport.size();
+  num_export = cpp_intExport.size();
   MPI_Bcast(&num_export, 1, MPI_INT, 0, MPI_COMM_WORLD);
   cpp_intExport.resize(num_export);
 
