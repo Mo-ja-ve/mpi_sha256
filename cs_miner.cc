@@ -138,9 +138,10 @@ int main(int argc, char *argv[]) {
     next_sha = sha256(t);
     if (t1 < next_sha) {
       if (next_sha < t2) {
+        bool local_found =true;
+        MPI_Allreduce(&local_found, &found, 1, MPI_C_BOOL, MPI_MAX, 0, MPI_COMM_WORLD);
 	//cerr << next_sha << endl;
-	cout << t << endl;
-	found =true;
+	     cout << t << endl;
       }
     }
     t=t+1;
