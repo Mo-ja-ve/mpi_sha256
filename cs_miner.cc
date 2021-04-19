@@ -134,16 +134,17 @@ int main(int argc, char *argv[]) {
   int stop_index = (int)t+25000;
   cpp_int next_sha;
   int found = 0;
+  int local_found = 0;
   while (!found) {
     next_sha = sha256(t);
     if (t1 < next_sha) {
       if (next_sha < t2) {
-        int local_found = 1;
-        MPI_Allreduce(&local_found, &found, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+        local_found = 1;
 	//cerr << next_sha << endl;
 	     cout << t << endl;
       }
     }
+    MPI_Allreduce(&local_found, &found, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
     t=t+1;
     if(t == stop_index){
       t = t*(cpp_int)num_procs;
