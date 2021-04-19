@@ -133,13 +133,13 @@ int main(int argc, char *argv[]) {
   cpp_int t      = (cpp_int)myid*25000;
   int stop_index = (int)t+25000;
   cpp_int next_sha;
-  bool found = false;
+  int found = 0;
   while (!found) {
     next_sha = sha256(t);
     if (t1 < next_sha) {
       if (next_sha < t2) {
-        bool local_found =true;
-        MPI_Allreduce(&local_found, &found, 1, MPI_C_BOOL, MPI_SUM, MPI_COMM_WORLD);
+        int local_found = 1;
+        MPI_Allreduce(&local_found, &found, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
 	//cerr << next_sha << endl;
 	     cout << t << endl;
       }
