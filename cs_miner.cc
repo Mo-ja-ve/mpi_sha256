@@ -22,14 +22,8 @@
 using namespace std;
 using namespace boost::multiprecision;
 
-
-
+//  function to broadcast to other processes, will be used twice in the main() for the two numbers from file we'll be using
 void broadcast(unsigned char &cpp_intExport){
-
-  // int buffer[2];
-  // buffer[0] = cpp_intExport.size();
-  //
-  // MPI_Bcast(buffer, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
   MPI_Bcast(&cpp_intExport, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
 }
@@ -72,6 +66,8 @@ cpp_int sha256(const cpp_int x)
   return total;
 }
 
+
+//  Andriy Kalinichenko
 int main(int argc, char *argv[]) {
 
   // init stuff for mpi
@@ -79,6 +75,8 @@ int main(int argc, char *argv[]) {
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+
+  // reading in from file, storing each long number in v_int
   vector <cpp_int> v_int;
   if(myid == 0){
     while (!cin.eof()) {
@@ -90,7 +88,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-
+  //  we need to do some conversion from cpp int into a format acceptable for MPI_Bcast
+  //  we use boost import_bits and export_bits for such a process, converting our first number at v_int[0]
+  //  into a vector of unsigned chars - call our broadcast function on each char in that vec - then convert that
+  //  char vec back into cpp_int in each process
   vector <unsigned char> cpp_intExport;
   if(myid == 0)
     export_bits(v_int[0], back_inserter(cpp_intExport), 8);
@@ -128,8 +129,13 @@ int main(int argc, char *argv[]) {
   cpp_int t2 = 0;
   import_bits(t2, cpp_intExport_2.begin(), cpp_intExport_2.end());
 
+  // broadcasting and conversions finished, we now check t1 is smaller than t2
   assert(t1 < t2);
 
+  //  each process will now conver a range of numbers to traverse, searching for our lucky number
+  //  the starting number for t will be determined by multiplying my id by 25000, and each processes
+  //  will search based on it's designated 25000 range chunk - if the number is not found another
+  //  itteration of this process will be done, using a larger chunk range each time - until our number is found
   cpp_int t      = (cpp_int)myid*25000;
   int stop_index = (int)t+25000;
   cpp_int next_sha;
@@ -144,6 +150,9 @@ int main(int argc, char *argv[]) {
 	     cout << t << endl;
       }
     }
+    //  found is used as our while loop control, so the process that finds our lucky number sets 'local_found'
+    //  then allreduce is called thus taking the local_found set to 1 by the finding process and reducing it
+    //  to all other processes thus breaking everyone out of the loop
     MPI_Allreduce(&local_found, &found, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
     t=t+1;
     if(t == stop_index){
